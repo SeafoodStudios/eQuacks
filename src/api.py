@@ -23,7 +23,10 @@ limiter = Limiter(
 def create_account():
     try:
         with lock:
-            data = request.json
+            if request.is_json:
+                data = request.json
+            else:
+                data = request.form
             username = data.get('username')
             password = data.get('password')
 
@@ -56,7 +59,7 @@ def create_account():
             os.rename(temp_path, database_path)
 
             logging.info(f"Account successfully created: {username}")
-            return 'Success, user added!', 200
+            return '<p>Success, user added!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
     except Exception as e:
         logging.error("Account unsuccessfully created: " + str(e))
         return "Generic error.", 500
@@ -64,7 +67,10 @@ def create_account():
 def delete_account():
     try:
         with lock:
-            data = request.json
+            if request.is_json:
+                data = request.json
+            else:
+                data = request.form
             username = data.get('username')
             password = data.get('password')
 
@@ -101,7 +107,7 @@ def delete_account():
             os.rename(temp_path, database_path)
 
             logging.info(f"Account successfully deleted: {username} with a balance of {balance}.")
-            return 'Success, user deleted!', 200
+            return '<p>Success, user deleted!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
     except Exception as e:
         logging.error("Account unsuccessfully deleted: " + str(e))
         return "Generic error.", 500
@@ -109,7 +115,10 @@ def delete_account():
 def transfer_currency():
     try:
         with lock:
-            data = request.json
+            if request.is_json:
+                data = request.json
+            else:
+                data = request.form
             username = data.get('username')
             password = data.get('password')
             receiver = data.get('receiver')
@@ -170,7 +179,7 @@ def transfer_currency():
             os.rename(temp_path, database_path)
 
             logging.info(f"Transaction successfully sent from {username} to {receiver} with an amount of {amount}.")
-            return 'Success, transaction sent!', 200
+            return '<p>Success, transaction sent!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
     except Exception as e:
         logging.error("Transaction unsuccessfully sent: " + str(e))
         return "Generic error.", 500
@@ -178,7 +187,10 @@ def transfer_currency():
 def get_balance():
     try:
         with lock:
-            data = request.json
+            if request.is_json:
+                data = request.json
+            else:
+                data = request.form
             username = data.get('username')
             password = data.get('password')
 
@@ -209,7 +221,7 @@ def get_balance():
             balance = str(database[username]['balance'])
 
             logging.info(f"{username} successfully counted a balance of {balance}.")
-            return balance, 200
+            return f"""<p>You have {balance} currency.</p> <a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 200
     except Exception as e:
         logging.error(f"{username} unsuccessfully counted their balance. " + str(e))
         return "Generic error.", 500
