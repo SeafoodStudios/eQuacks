@@ -1,1 +1,1 @@
-# eQuacks is still in development. Check back in later.
+# eQuacks is still in early development. Check back in later.
