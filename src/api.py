@@ -6,7 +6,10 @@ import os
 import logging
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
+ph = PasswordHasher()
 app = Flask(__name__)
 database_path = "equacks_database.json"
 lock_path = "equacks_database.lock"
@@ -50,7 +53,7 @@ def create_account():
             if username in database:
                 return """<p>Username taken. Pick another one.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+            hashed_password = ph.hash(password)
             database[username] = {"password": hashed_password, "balance": 0}
 
             temp_path = database_path + ".tmp"
@@ -94,9 +97,11 @@ def delete_account():
             if not username in database:
                 return """<p>User does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            if not database[username]["password"] == hashed_password:
-                return """Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
+            try:
+                ph.verify(database[username]["password"], password)
+            except VerifyMismatchError:
+                logging.error(f"{username} unsuccessfully logged in because of invalid password.")
+                return """<p>Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             balance = database[username]['balance']
             del database[username]
@@ -160,8 +165,10 @@ def transfer_currency():
             if not receiver in database:
                 return """<p>Receiver does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            if not database[username]["password"] == hashed_password:
+            try:
+                ph.verify(database[username]["password"], password)
+            except VerifyMismatchError:
+                logging.error(f"{username} unsuccessfully logged in because of invalid password.")
                 return """<p>Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if not database[username]['balance'] >= amount:
@@ -214,8 +221,10 @@ def get_balance():
             if not username in database:
                 return """<p>User does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            if not database[username]["password"] == hashed_password:
+            try:
+                ph.verify(database[username]["password"], password)
+            except VerifyMismatchError:
+                logging.error(f"{username} unsuccessfully logged in because of invalid password.")
                 return """<p>Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             balance = str(database[username]['balance'])
@@ -231,3 +240,23 @@ def ping():
         return "Pinged!", 200
     except:
         return "Generic error.", 500
+@app.route('/total_supply', methods=['GET'])
+def total_supply():
+    try:
+        if not os.path.exists(database_path):
+            with open(database_path, "w") as f:
+                json.dump({}, f)
+
+        with open(database_path, 'r') as f:
+            database = json.load(f)
+
+        supply = 0
+
+        for user in database:
+            supply += database[user]['balance']
+
+        return f"""<p>There is a total supply of {supply} eQuack/s.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 200
+
+    except Exception as e:
+        logging.error(f"Unsuccessfully counted the total supply." + str(e))
+        return """<p>Generic error.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 500
