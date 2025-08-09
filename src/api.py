@@ -36,9 +36,9 @@ def create_account():
                 return "Password must be string.", 400
 
             if len(username) > 50:
-                return "Username cannot be longer than 50 characters.", 400
+                return """<p>Username cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             if len(password) > 50:
-                return "Password cannot be longer than 50 characters.", 400
+                return """<p>Password cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if not os.path.exists(database_path):
                 with open(database_path, "w") as f:
@@ -48,7 +48,7 @@ def create_account():
                 database = json.load(f)
 
             if username in database:
-                return "Username taken. Pick another one.", 400
+                return """<p>Username taken. Pick another one.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
             database[username] = {"password": hashed_password, "balance": 0}
@@ -62,7 +62,7 @@ def create_account():
             return '<p>Success, user added!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
     except Exception as e:
         logging.error("Account unsuccessfully created: " + str(e))
-        return "Generic error.", 500
+        return """<p>Generic error.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 500
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
     try:
@@ -80,9 +80,9 @@ def delete_account():
                 return "Password must be string.", 400
 
             if len(username) > 50:
-                return "Username cannot be longer than 50 characters.", 400
+                return """<p>Username cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             if len(password) > 50:
-                return "Password cannot be longer than 50 characters.", 400
+                return """<p>Password cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if not os.path.exists(database_path):
                 with open(database_path, "w") as f:
@@ -92,11 +92,11 @@ def delete_account():
                 database = json.load(f)
 
             if not username in database:
-                return "User does not exist.", 400
+                return """<p>User does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
             if not database[username]["password"] == hashed_password:
-                return "Incorrect password.", 400
+                return """Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             balance = database[username]['balance']
             del database[username]
@@ -110,7 +110,7 @@ def delete_account():
             return '<p>Success, user deleted!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
     except Exception as e:
         logging.error("Account unsuccessfully deleted: " + str(e))
-        return "Generic error.", 500
+        return """<p>Generic error.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 500
 @app.route('/transfer_currency', methods=['POST'])
 def transfer_currency():
     try:
@@ -137,16 +137,16 @@ def transfer_currency():
                 if int(amount) > 0:
                     amount = int(amount)
                 else:
-                    return "Amount must be larger than zero.", 400
+                    return """<p>Amount must be larger than zero.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             else:
-                return "Amount must be a digit.", 400
+                return """<p>Amount must be a digit.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if len(username) > 50:
-                return "Username cannot be longer than 50 characters.", 400
+                return """<p>Username cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             if len(password) > 50:
-                return "Password cannot be longer than 50 characters.", 400
+                return """<p>Password cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             if len(receiver) > 50:
-                return "Receiver cannot be longer than 50 characters.", 400
+                return """<p>Receiver cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if not os.path.exists(database_path):
                 with open(database_path, "w") as f:
@@ -156,19 +156,19 @@ def transfer_currency():
                 database = json.load(f)
 
             if not username in database:
-                return "User does not exist.", 400
+                return """<p>User does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             if not receiver in database:
-                return "Receiver does not exist.", 400
+                return """<p>Receiver does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
             if not database[username]["password"] == hashed_password:
-                return "Incorrect password.", 400
+                return """<p>Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if not database[username]['balance'] >= amount:
-                return "You don't have enough currency to make this transaction.", 400
+                return """<p>You don't have enough currency to make this transaction.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if username == receiver:
-                return "You cannot transfer currency to yourself.", 400
+                return """<p>You cannot transfer currency to yourself.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             database[username]['balance'] = database[username]['balance'] - amount
             database[receiver]['balance'] = database[receiver]['balance'] + amount
@@ -182,7 +182,7 @@ def transfer_currency():
             return '<p>Success, transaction sent!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
     except Exception as e:
         logging.error("Transaction unsuccessfully sent: " + str(e))
-        return "Generic error.", 500
+        return """<p>Generic error.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 500
 @app.route('/get_balance', methods=['POST'])
 def get_balance():
     try:
@@ -200,9 +200,9 @@ def get_balance():
                 return "Password must be string.", 400
 
             if len(username) > 50:
-                return "Username cannot be longer than 50 characters.", 400
+                return """<p>Username cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
             if len(password) > 50:
-                return "Password cannot be longer than 50 characters.", 400
+                return """<p>Password cannot be longer than 50 characters.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             if not os.path.exists(database_path):
                 with open(database_path, "w") as f:
@@ -212,19 +212,19 @@ def get_balance():
                 database = json.load(f)
 
             if not username in database:
-                return "User does not exist.", 400
+                return """<p>User does not exist.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
             if not database[username]["password"] == hashed_password:
-                return "Incorrect password.", 400
+                return """<p>Incorrect password.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 400
 
             balance = str(database[username]['balance'])
 
             logging.info(f"{username} successfully counted a balance of {balance}.")
-            return f"""<p>You have {balance} currency.</p> <a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 200
+            return f"""<p>You have {balance} eQuack/s.</p> <a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 200
     except Exception as e:
         logging.error(f"{username} unsuccessfully counted their balance. " + str(e))
-        return "Generic error.", 500
+        return """<p>Generic error.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 500
 @app.route('/ping', methods=['GET'])
 def ping():
     try:
