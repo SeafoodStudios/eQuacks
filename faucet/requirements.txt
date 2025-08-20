@@ -1,0 +1,8 @@
+Flask
+Flask-Limiter
+groq
+wonderwords
+better-profanity
+filelock
+requests
+markupsafe
