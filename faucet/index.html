@@ -1,0 +1,33 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="d-flex align-items-center mb-4">
+        <h1 class="mb-0">eQuacksFaucet</h1>
+        <img src="https://raw.githubusercontent.com/SeafoodStudios/eQuacks/main/resources/logo.png" alt="eQuacks Logo" style="width: 50px; height: auto; margin-left: 15px;">
+    </div>
+    <p>eQuacksFaucet is a faucet for <a href="https://equacks.seafoodstudios.com/">eQuacks</a>. A faucet is a simple, safe way to spread the currency.</p>
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 0vh;">
+    <p>To earn eQuacks, answer the riddle. eQuacks has no monetary value and is not a cryptocurrency. It should not be treated as such.</p>
+    <p>By answering a riddle, you must already have a account and agree to our <a href="https://equacks.seafoodstudios.com/tos.html">terms of service</a>.</p>
+    <div class="card text-center mb-4" style="max-width: 500px;">
+      <div class="card-header">
+        Random Riddle
+      </div>
+      <div class="card-body">
+        <p class="card-text">{{ riddle }}</p>
+      </div>
+    </div>
+    <form action="https://equacksfaucet.pythonanywhere.com/guess" method="post">
+        <label for="username">Enter your username.</label>
+        <br>
+        <input type="text" id="username" name="username">
+        <br>
+        <label for="guess">Enter your guess.</label>
+        <br>
+        <input type="text" id="guess" name="guess">
+        <br>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
