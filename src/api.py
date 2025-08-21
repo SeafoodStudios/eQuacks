@@ -3,11 +3,14 @@ from filelock import FileLock
 import json
 import hashlib
 import os
+import time
 import logging
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from markupsafe import escape
+import requests
 
 ph = PasswordHasher()
 app = Flask(__name__)
@@ -185,8 +188,17 @@ def transfer_currency():
                 json.dump(database, f)
             os.rename(temp_path, database_path)
 
-            logging.info(f"Transaction successfully sent from {username} to {receiver} with an amount of {amount}.")
-            return '<p>Success, transaction sent!</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>', 200
+            record_data = {
+                "password": os.environ.get("record_db_password"),
+                "record": f"""{username} sent {receiver} {amount} eQuacks on {int(time.time())} Unix time."""
+            }
+            record_response = requests.post("https://equacksrecord.pythonanywhere.com/submit_record", json=record_data)
+            if record_response.status_code == 200:
+                logging.info(f"Transaction successfully sent from {username} to {receiver} with an amount of {amount}.")
+                return f"""<p>Success, transaction sent!</p><p>Permanent transaction receipt:</p><a href="{escape('https://equacksrecord.pythonanywhere.com/get_record/' + record_response.text)}">{escape('https://equacksrecord.pythonanywhere.com/get_record/' + record_response.text)}</a><br><br><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 200
+            else:
+                logging.info(f"Transaction successfully sent from {username} to {receiver} with an amount of {amount}. But, receipt could not be made because {escape(record_response.text)}.")
+                return """<p>Success, transaction sent! But, the receipt could not be made.<p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 200
     except Exception as e:
         logging.error("Transaction unsuccessfully sent: " + str(e))
         return """<p>Generic error.</p><a href="https://equacks.seafoodstudios.com/">Go back to homepage</a>""", 500
