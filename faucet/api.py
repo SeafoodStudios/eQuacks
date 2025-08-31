@@ -64,7 +64,7 @@ def guess():
                         break
 
                 completion = client.chat.completions.create(
-                    model="llama3-8b-8192",
+                    model="llama-3.1-8b-instant",
                     messages=[{"role": "user", "content": f"""Create a riddle on '{answer}'. Make a different answer anytime. Make the riddle moderately hard but solvable. When appropriate, you can include ducks in the riddle. Do not make any other comments like 'Here is your riddle' or 'Here you go!'. Only the riddle please."""}]
                 )
                 riddle = completion.choices[0].message.content
@@ -106,7 +106,7 @@ def guess():
                         break
 
                 completion = client.chat.completions.create(
-                    model="llama3-8b-8192",
+                    model="llama-3.1-8b-instant",
                     messages=[{"role": "user", "content": f"""Create a riddle on '{answer}'. Make a different answer anytime. Make the riddle moderately hard but solvable. When appropriate, you can include ducks in the riddle. Do not make any other comments like 'Here is your riddle' or 'Here you go!'. Only the riddle please."""}]
                 )
                 riddle = completion.choices[0].message.content
